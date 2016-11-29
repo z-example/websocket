@@ -1,8 +1,8 @@
 package org.example.websocket;
 
-import javax.websocket.OnMessage;
-import javax.websocket.Session;
+import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
+import java.io.IOException;
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,11 +13,22 @@ import javax.websocket.server.ServerEndpoint;
  */
 @ServerEndpoint("/chat_app")
 public class JSRChatWebSocketEndpoint {
-
+                              //Endpoint
     @OnMessage
     public void message(String message, Session session) {
         for (Session s : session.getOpenSessions()) {
             s.getAsyncRemote().sendText(message);
         }
+    }
+
+    @OnError
+    public void err(Session session, Throwable t) {
+        t.printStackTrace();
+    }
+
+    @OnOpen
+    public void open(Session session, EndpointConfig config) throws IOException {
+        session.getBasicRemote().sendText("Server Session Opened!");
+        System.out.printf("session");
     }
 }

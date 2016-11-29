@@ -42,7 +42,6 @@ public class JSRWebSocketServer {
                 )
                 .setDeploymentName("chat.war");
 
-
         DeploymentManager manager = container.addDeployment(builder);
         manager.deploy();
         try {
