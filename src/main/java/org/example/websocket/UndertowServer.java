@@ -14,9 +14,10 @@ import javax.servlet.ServletException;
 
 /**
  * http://undertow.io/undertow-docs/undertow-docs-1.3.0/#websockets
+ *
  * @author Stuart Douglas
  */
-public class JSRWebSocketServer {
+public class UndertowServer {
 
     public static void main(final String[] args) {
         PathHandler path = Handlers.path();
@@ -28,21 +29,22 @@ public class JSRWebSocketServer {
                 .build();
         server.start();
 
+        WebSocketDeploymentInfo webSocket = new WebSocketDeploymentInfo();
+        webSocket.setBuffers(new DefaultByteBufferPool(true, 100));
+        webSocket.addEndpoint(JsrChatServerEndpoint.class);
+
+
         final ServletContainer container = ServletContainer.Factory.newInstance();
 
-        DeploymentInfo builder = new DeploymentInfo()
-                .setClassLoader(JSRWebSocketServer.class.getClassLoader())
+        DeploymentInfo deploymentInfo = new DeploymentInfo()
+                .setClassLoader(UndertowServer.class.getClassLoader())
                 .setContextPath("/")
                 .addWelcomePage("index.html")
-                .setResourceManager(new ClassPathResourceManager(JSRWebSocketServer.class.getClassLoader(), JSRWebSocketServer.class.getPackage()))
-                .addServletContextAttribute(WebSocketDeploymentInfo.ATTRIBUTE_NAME,
-                        new WebSocketDeploymentInfo()
-                                .setBuffers(new DefaultByteBufferPool(true, 100))
-                                .addEndpoint(JSRChatWebSocketEndpoint.class)
-                )
+                .setResourceManager(new ClassPathResourceManager(UndertowServer.class.getClassLoader(), UndertowServer.class.getPackage()))
+                .addServletContextAttribute(WebSocketDeploymentInfo.ATTRIBUTE_NAME,webSocket)
                 .setDeploymentName("chat.war");
 
-        DeploymentManager manager = container.addDeployment(builder);
+        DeploymentManager manager = container.addDeployment(deploymentInfo);
         manager.deploy();
         try {
             path.addPrefixPath("/", manager.start());

@@ -12,12 +12,12 @@ import java.io.IOException;
  * @author: Zero
  */
 @ServerEndpoint("/chat_app")
-public class JSRChatWebSocketEndpoint {
+public class JsrChatServerEndpoint {
                               //Endpoint
     @OnMessage
     public void message(String message, Session session) {
         for (Session s : session.getOpenSessions()) {
-            s.getAsyncRemote().sendText(message);
+            s.getAsyncRemote().sendText("Server received your message: "+message);
         }
     }
 
